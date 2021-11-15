@@ -1,9 +1,19 @@
-const bodyParser = require('body-parser')
-const cors = require('cors')
-const express = require('express')
-const port = process.env.PORT || 9000
-const app = express()
+var express = require('express');
+var { graphqlHTTP } = require('express-graphql');
+var { buildSchema } = require('graphql');
 
-//register middleware
-app.use(bodyParser.json(), cors())
-app.listen(port, () => console.log(`server is up and running at ${port}`))
+var schema = buildSchema(`
+  type Query {
+    hello: String
+  }
+`);
+
+var root = { hello: () => 'Hello world!' };
+
+var app = express();
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: root,
+  graphiql: true,
+}));
+app.listen(4000, () => console.log('Now browse to localhost:4000/graphql'));
